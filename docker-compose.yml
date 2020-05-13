@@ -12,7 +12,7 @@ services:
       # Laravelプロジェクトと繋ぐ
       - ./codeIgniter_app:/var/www/codeIgniter_app
     ports:
-      - 58901:80
+      - 58910:80
     networks:
       - codeignater_network
     depends_on:
@@ -26,6 +26,22 @@ services:
       dockerfile: ./phpfpm/Dockerfile
     volumes:
       - ./codeIgniter_app:/var/www/codeIgniter_app
+    networks:
+      - codeignater_network
+    depends_on:
+      - mysql
+    tty: true
+
+  mysql:
+    build:
+      context: .
+      dockerfile: ./mysql/Dockerfile
+    volumes: 
+      - ./logs/mysql:/var/log/mysql
+    environment:
+      TZ: 'Asia/Tokyo'
+    ports:
+      - 58920:3306
     networks:
       - codeignater_network
     tty: true

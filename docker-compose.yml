@@ -1,0 +1,34 @@
+version: "3"
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    volumes:
+      # アクセスログ・エラーログを外部に保存する
+      - ./logs/nginx:/var/log/nginx
+      # 設定ファイルを外部に保存する
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      # Laravelプロジェクトと繋ぐ
+      - ./codeIgniter_app:/var/www/codeIgniter_app
+    ports:
+      - 58901:80
+    networks:
+      - codeignater_network
+    depends_on:
+      # PHPの後に処理を実行しはじめる
+      - phpfpm
+    tty: true
+
+  phpfpm:
+    build:
+      context: .
+      dockerfile: ./phpfpm/Dockerfile
+    volumes:
+      - ./codeIgniter_app:/var/www/codeIgniter_app
+    networks:
+      - codeignater_network
+    tty: true
+
+networks:
+  codeignater_network:

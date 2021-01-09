@@ -20,6 +20,36 @@ class Welcome extends CI_Controller {
 	 */
 	public function index()
 	{
+
+		$purchase_infos =[
+			0 => [
+				'name' => 'サランラップ',
+				'money' => 3500,
+			],
+			1 => [
+				'name' => 'サランラップ2',
+				'money' => 8200,
+			],
+		];
+
+		$this->db->query('lock table sequence write');
+		$this->db->trans_start();
+		foreach($purchase_infos as $purchase_info){
+			$this->db->reset_query();
+			$query = $this->db->get('secuence');
+			$last_number = $query->row_array();
+
+			$this->db->reset_query();
+			$purchase_info['id'] = $last_number;
+			$this->db->insert('purchase_log', $purchase_info);
+
+			$this->db->reset_query();
+			$this->db->where('id', 2);
+			$this->db->update('sequence',['id' => ($last_number + 1)]);
+		}
+		$this->db->trans_complete();
+		$this->db->query('unlock table sequence');
+
 		$this->load->view('welcome_message');
 	}
 }
